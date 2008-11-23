@@ -1,0 +1,39 @@
+NAME
+	Where's my car?
+
+DESCRIPTION
+	A small web app that scrapes SF GIS and sends email and SMS alerts
+	when you need to move your car for street cleaning.
+
+INSTALLATION
+	Download or checkout wheresmycar from GitHub.  Use the included
+	httpd.conf and root your VirtualHost at <wheresmycar>/public.
+
+	Use mixinstall or other means to install Sometimes (and run `make`) at
+	<wheresmycar>/include/sometimes.
+
+	Create <wheresmycar>/include/config.php by following along from
+	<wheresmycar>/include/config.php.example.
+
+DEPENDENCIES
+	PHP <http://php.net/>
+	Sometimes <http://github.com/rcrowley/sometimes>
+	MySQL <http://mysql.com/>
+
+VERSION
+	Can't be pinned down
+
+DATE
+	2008-11-21
+
+AUTHOR
+	Richard Crowley <r@rcrowley.org>
+
+SEE ALSO
+	<http://rcrowley.org/tags/wheresmycar>
+	<http://github.com/rcrowley/mixinstall>
+
+LICENSE
+	This work is license under a Creative Commons
+	Attribution-Share Alike 3.0 Unported License
+	<http://creativecommons.org/licenses/by-sa/3.0/>
