@@ -1,0 +1,5 @@
+#!/bin/sh
+sleep 5
+echo "[supervise] gis starting"
+exec 2>&1
+exec /work/www/car/bin/gis

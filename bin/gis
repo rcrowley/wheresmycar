@@ -1,0 +1,20 @@
+#!/usr/bin/php
+<?php
+
+require_once dirname(__FILE__) . '/../include/bin.php';
+
+loadlib('db');
+loadlib('gis');
+loadlib('location');
+
+# Get an address that doesn't have a street cleaning schedule
+#   This orders randomly now because otherwise this will favor early users
+$users = db_query("SELECT id, address FROM users WHERE address != ''
+	AND sweep_ts IS NULL;");
+if (!is_array($users) || !sizeof($users)) { exit; }
+foreach ($users as $user) {
+	if ('' == $user['address']) { continue; }
+	$ts = gis_sweep($user['address']);
+	if ($ts) { location_set_sweep($ts, $user['id']); }
+	else { location_impossible($user['id']); }
+}

@@ -1,0 +1,23 @@
+#!/usr/bin/php
+<?php
+
+# Email or SMS
+if (2 != sizeof($argv) || !is_numeric($argv[1])) {
+	die("Usage: {$argv[0]} user_id\n");
+}
+$user_id = $argv[1];
+
+require_once dirname(__FILE__) . '/../include/bin.php';
+
+loadlib('db');
+
+$user = db_query("SELECT sms FROM users WHERE id = '" . (int)$user_id . "';");
+if (!is_array($user) || !sizeof($user)) { exit; }
+mail($user[0]['sms'], '', 'Enter the confirmation code ' .
+	substr(sha1($GLOBALS['SALT'] . $user[0]['sms']), 0, 6) .
+	' at car.rcrowley.org (sorry this message was late)',
+	"From: Where's my car?\r\n");
+
+# Log some stats
+file_put_contents(dirname(__FILE__) . "/../log/sms.log",
+	date('r') . " -- Sent 1 late\n", FILE_APPEND | LOCK_EX);

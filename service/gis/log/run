@@ -1,0 +1,2 @@
+#!/bin/sh
+exec multilog s2097152 n100 /var/multilog/gis

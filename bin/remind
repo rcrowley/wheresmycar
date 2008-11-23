@@ -1,0 +1,49 @@
+#!/usr/bin/php
+<?php
+
+# Email or SMS
+if (2 != sizeof($argv) || !in_array($argv[1], array('email', 'sms'))) {
+	die("Usage: {$argv[0]} (email|sms)\n");
+}
+$mode = $argv[1];
+
+require_once dirname(__FILE__) . '/../include/bin.php';
+
+loadlib('db');
+loadlib('gis');
+loadlib('location');
+
+# Get users that need warnings for tomorrow
+$tomorrow = strtotime('+1 day');
+$users = db_query("SELECT id, $mode AS `to`, address, sweep, sweep_ts,
+	sent_$mode FROM users WHERE sent_$mode = '0' AND sweep_ts >= '" .
+	strtotime(date('Y-m-d 00:00:00', $tomorrow)) . "' AND sweep_ts <= '" .
+	strtotime(date('Y-m-d 23:59:59', $tomorrow)) . "';");
+if (!is_array($users)) { exit; }
+foreach ($users as $user) {
+	$mode($user['to'], $user['address'], $user['sweep_ts']);
+	db_query("UPDATE users SET sent_$mode = '1' WHERE id = '" .
+		(int)$user['id'] . "' LIMIT 1;");
+}
+
+# Log some stats
+file_put_contents(dirname(__FILE__) . "/../log/$mode.log",
+	date('r') . ' -- Sent ' . sizeof($users) . "\n", FILE_APPEND | LOCK_EX);
+
+function email($to, $address, $sweep_ts) {
+	mail($to, 'Move your car tomorrow!',
+		"The last time you updated on Where's my car?, you were parked at:\n" .
+		"$address\n\n" .
+		"That street will be cleaned tomorrow, so consider yourself warned!\n" .
+		date('g:i a, l, F, jS', $sweep_ts) . "\n\n" .
+		"Don't forget to visit http://car.rcrowley.org/ to update when you " .
+		"move your car again.",
+		"From: Where's my car? <nobody@car.rcrowley.org>\r\n");
+}
+
+function sms($to, $address, $sweep_ts) {
+	mail($to, '',
+		"Your car is at $address and you need to move it by " .
+		date('g:i a, D, M, jS', $sweep_ts) . ".  Don't forget!",
+		"From: Where's my car?\r\n");
+}

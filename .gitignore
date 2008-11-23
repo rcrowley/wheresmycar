@@ -1,0 +1,10 @@
+.templates
+include/config.php
+include/sometimes/xhtml11.php
+
+#### Mixed project: sometimes ####
+include/sometimes/Makefile
+include/sometimes/bin/xhtml11
+include/sometimes/foo.html.php
+include/sometimes/sometimes.php
+####

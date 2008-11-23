@@ -1,0 +1,2 @@
+00 04 * * * /work/www/car/bin/remind email
+00 19 * * * /work/www/car/bin/remind sms

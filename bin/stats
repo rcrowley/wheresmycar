@@ -1,0 +1,65 @@
+#!/usr/bin/php
+<?php
+
+require_once dirname(__FILE__) . '/../include/bin.php';
+
+loadlib('db');
+
+# Total users and users today
+$total = db_query("SELECT COUNT(*) AS c FROM users;");
+echo "mysql count users: ";
+if (is_array($total) && sizeof($total)) { echo $total[0]['c']; }
+echo "\n";
+$today = db_query("SELECT COUNT(*) AS c FROM users WHERE created >= '" .
+	date('Y-m-d 00:00:00') . "' AND created <= '" . date('Y-m-d 23:59:59') .
+	"';");
+echo "mysql new users today: ";
+if (is_array($today) && sizeof($today)) { echo $today[0]['c']; }
+echo "\n";
+
+# Confirmed email addresses and phone numbers
+foreach (array('email', 'sms') as $mode) {
+	$$mode = db_query(
+		"SELECT COUNT(*) AS c FROM users WHERE confirm_$mode = '1';");
+	echo "confirmed $mode: ";
+	if (is_array($$mode) && sizeof($$mode)) { echo $GLOBALS[$mode][0]['c']; }
+	echo "\n";
+}
+
+# Total visits to the start page
+echo "GET /start: ", `grep 'GET /start' /work/www/car/log/car.log | wc -l`;
+
+# Total visits to the home page
+echo "GET /home: ", `grep 'GET /home' /work/www/car/log/car.log | wc -l`;
+
+# Total updates
+echo "POST /home: ", `grep 'POST /home' < /work/www/car/log/car.log | wc -l`;
+
+# Total geocodings
+$ratios = explode("\n", `awk '{print $9}' < /work/www/car/log/gis.log`);
+$total_ok = 0;
+$total_attempted = 0;
+foreach ($ratios as $r) {
+	list($ok, $attempted) = explode('/', $r);
+	$total_ok += $ok;
+	$total_attempted += $attempted;
+}
+echo "geocodings: $total_ok ok, $total_attempted attempted\n";
+
+# Total emails and SMS's
+echo "reminder email: ", array_sum(explode("\n",
+	`awk '{print $9}' < /work/www/car/log/email.log`)), "\n";
+echo "reminder sms: ", array_sum(explode("\n",
+	`awk '{print $9}' < /work/www/car/log/sms.log`)), "\n";
+
+# User statuses
+$users = db_query(
+	"SELECT id, username, email, confirm_email, sms, confirm_sms
+	FROM users ORDER BY id ASC;");
+if (!is_array($users)) { exit; }
+echo "\n";
+foreach ($users as $u) {
+	printf("%2d  %14s  %s%s  %s%s\n", $u['id'], $u['username'],
+		$u['email'], ($u['confirm_email'] ? '' : '?'),
+		$u['sms'], ($u['confirm_sms'] ? '' : '?'));
+}
