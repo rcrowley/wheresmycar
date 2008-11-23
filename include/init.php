@@ -22,5 +22,5 @@ EOD;
 # The debug function on the website should only print if we're in dev
 function debug($msg) {
 	if ('dev' != substr($_SERVER['HTTP_HOST'], 0, 3)) { return; }
-	echo "<!--\n$msg-->\n";
+	if ('json' != @$GLOBALS['FORMAT']) { echo "<!--\n$msg-->\n"; }
 }

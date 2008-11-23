@@ -6,6 +6,13 @@
 
 $routes = array(
 
+	# The API
+	'/api/sweep' => 'api_sweep.php',
+
+
+
+	# The actual site
+
 	'/confirm/email/([0-9a-f]+)' => 'confirm_email.php',
 	'/confirm/sms' => 'confirm_sms.php',
 
