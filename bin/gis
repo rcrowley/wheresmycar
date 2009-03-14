@@ -10,7 +10,7 @@ loadlib('location');
 # Get an address that doesn't have a street cleaning schedule
 #   This orders randomly now because otherwise this will favor early users
 $users = db_query("SELECT id, address FROM users WHERE address != ''
-	AND sweep_ts IS NULL;");
+	AND sweep_ts IS NULL AND impossible = '0';");
 if (!is_array($users) || !sizeof($users)) { exit; }
 foreach ($users as $user) {
 	if ('' == $user['address']) { continue; }
